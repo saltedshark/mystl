@@ -1,19 +1,15 @@
 //myallocator接口
+//该接口的实现参考了cppreference
+//具有多种实现的，比如仅c++版本不同的情况，仅实现c++11还在用的，前后版本的都暂不考虑
 #ifndef _MYALLOCATOR_
 #define _MYALLOCATOR_
 
-#ifndef _NEW_
-#define _NEW_
-#include <new> 			//for placement new
-#endif
 #include <cstddef>		//for ptrdiff_t, size_t
-#include <iostream>		//for cerr
-#include <cstdlib>		//for exit
-#include <climits>		//for UINT_MAX
-template <typename T>
+
+template< class T >
 class allocator {
 public:
-	//类型定义
+	//Member types, 算上rebind，共计10个
 	typedef T				value_type;
 	typedef T*				pointer;
 	typedef const T*		const_pointer;
@@ -21,31 +17,51 @@ public:
 	typedef const T&		const_reference;
 	typedef size_t			size_type;
 	typedef ptrdiff_t		difference_type;
+	//typedef xxx			propagate_on_container_move_assignment
+	//typedef xxx			is_always_equal
 	
 	//rebind
-	template <typename U>
+	template< class U >
 	struct rebind {
 		typedef allocator<U> other;
 	};
-	//构造函数相关
-	allocator();						//default contor
-	allocator(const allocator&);		//copy contor
-	template <class U> allocator(const allocator<U>&);//泛化的copy contor
+	
+	//Member functions
+	
+	//ctor
+	//noexcept即noexcept(true)表示不会抛出异常,有利于编译器做优化
+	allocator() noexcept;
+	allocator( const allocator& other ) noexcept;//从同类型的构建
+	template< class U >
+	allocator( const allocator<U>& other ) noexcept;//从类型U构建
+	
+	//dtor
 	~allocator();
 
 	//普通接口
-	pointer address(reference x) const;
-	const_pointer address(const_reference x) const;
-	size_type max_size() const;
+	pointer address( reference x ) const noexcept;
+	const_pointer address( const_reference x ) const noexcept;
+	size_type max_size() const noexcept;
 	//内存分配释放
-	pointer allocate(size_type n);
-	void deallocate(pointer p);
+	//hint是用于提供局部性的参数，如果支持该功能，将分配接近于hint值的内存
+	pointer allocate( size_type n, const void* hint = 0 );
+	void deallocate ( T* p, std::size_t n );
+
 	//构造与析构
-	void construct(pointer p, const T& x);
-	void destroy(pointer p);
+	template< class U, class... Args >
+	void construct ( U* p, Args&&... args );
+	template< class U >
+	void destroy( U* p);
 
 
 };
+
+//Non-member functions
+//不着急实现，当前还暂时用不到
+/*
+operator==
+operator!=
+*/
 
 //末尾包含实现文件
 #include "allocator.cpp"
