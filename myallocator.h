@@ -1,11 +1,11 @@
 //myallocator接口
-//该接口的实现参考了cppreference
-//具有多种实现的，比如仅c++版本不同的情况，仅实现c++11还在用的，前后版本的都暂不考虑
-#ifndef _MYALLOCATOR_
-#define _MYALLOCATOR_
+//该接口实现参考了cppreference
+//具有多种实现的，比如仅c++版本不同的情况，仅实现当前c++11还在用的，前后版本的都暂不考虑
+#ifndef MYALLOCATOR_H
+#define MYALLOCATOR_H
 
 #include <cstddef>		//for ptrdiff_t, size_t
-
+namespace mystl {
 template< class T >
 class allocator {
 public:
@@ -63,7 +63,8 @@ operator==
 operator!=
 */
 
-//末尾包含实现文件
+}
+//末尾包含实现文件,且放到namespace之外，若放到namespace之内那么被包含的文件将成为该namespace的一部分，会引发问题
+//若按照传统写法在.cpp内包含.h文件，template相关的类会出链接问题，但反过来包含使用的时候就不会有这样问题
 #include "allocator.cpp"
-
 #endif
