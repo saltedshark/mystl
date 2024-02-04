@@ -45,7 +45,7 @@ public:
 	//内存分配释放
 	//hint是用于提供局部性的参数，如果支持该功能，将分配接近于hint值的内存
 	pointer allocate( size_type n, const void* hint = 0 );
-	void deallocate ( T* p, std::size_t n );
+	void deallocate ( T* p, size_t n );
 
 	//构造与析构
 	template< class U, class... Args >
